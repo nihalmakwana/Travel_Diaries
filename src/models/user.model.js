@@ -20,6 +20,9 @@ const userSchema = new Schema(
         createdOn: {
             type: Date,
             default: Date.now
+        },
+        refreshToken: {
+            type: String
         }
     },
     {
