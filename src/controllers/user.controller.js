@@ -88,13 +88,45 @@ const loginUser = asyncHandler( async (req, res) => {
     return res
     .status(200)
     .cookie("accessToken", accessToken, option)
-    .cookie("refreshToken", refreshToken. option)
+    .cookie("refreshToken", refreshToken, option)
     .json(
         new ApiResponse(200, { user: loggedInUser, accessToken, refreshToken }, "User Logged In Successfully!!!")
     )
 })
 
+const logoutUser = asyncHandler( async (req, res) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", option)
+    .clearCookie("refreshToken", option)
+    .json(
+        new ApiResponse(200, {}, "User Logged Out")
+    )
+})
+
+const getCurrentUser = asyncHandler( async (req, res) => {
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, req.user, "Current User Fetched..")
+    )
+})
+
 export {
     registerUser,
-    loginUser
+    loginUser,
+    logoutUser,
+    getCurrentUser
 }
