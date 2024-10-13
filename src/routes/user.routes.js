@@ -1,10 +1,17 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middlewares.js"
 import { 
+    addTravelStory,
+    deleteStory,
+    editStory,
+    filterStories,
+    getAllStories,
     getCurrentUser,
     loginUser, 
     logoutUser, 
-    registerUser 
+    registerUser, 
+    searchStory, 
+    updateIsFavourite
 } from "../controllers/user.controller.js";
 
 const router = Router()
@@ -15,5 +22,12 @@ router.route("/login").post(loginUser)
 //Secure Routes
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/get-user").get(verifyJWT, getCurrentUser)
+router.route("/add-travel-story").post(verifyJWT, addTravelStory)
+router.route("/get-all-stories/:userId").get(verifyJWT, getAllStories)
+router.route("/edit-story").post(verifyJWT, editStory)
+router.route("/delete-story/:id/:userId").delete(verifyJWT, deleteStory)
+router.route("/update-is-favourite/:id/:userId").post(verifyJWT, updateIsFavourite)
+router.route("/search-story/:userId").post(verifyJWT, searchStory)
+router.route("/filter-stories/:userId").get(verifyJWT, filterStories)
 
 export default router
