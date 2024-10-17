@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.model.js"
 import { TravelStory } from "../models/travelStory.model.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 const option = {
     httpOnly: true,
@@ -126,22 +127,35 @@ const getCurrentUser = asyncHandler( async (req, res) => {
 })
 
 const addTravelStory = asyncHandler( async (req, res) => {
-    const { userId, title, story, visitedLocation, imageUrl, visitedDate } = req.body
+    const { title, story, visitedLocation, visitedDate } = req.body
+    const { _id } = req.user
     
-    if (!title || !story || !visitedLocation || !imageUrl || !visitedDate || !userId) {
+    if (!title || !story || !visitedLocation || !visitedDate) {
         throw new ApiError(400, "All fields are required...")
     }
 
     //Convert visitedDate from milliseconds to Date Object
     const parseVisitedDate = new Date(parseInt(visitedDate))
 
+    const imageLocalPath = req.file?.path
+    
+    if (!imageLocalPath) {
+        throw new ApiError(400, "Image is Required...")
+    }
+
+    const image = await uploadOnCloudinary(imageLocalPath)
+    console.log(image)
+    if (!image) {
+        throw new ApiError(400, "Image local path is Required...")
+    }
+
     try {
         const travelStory = new TravelStory({
-            userId,
+            userId: _id,
             title,
             story,
             visitedLocation, 
-            imageUrl, 
+            imageUrl: image.url, 
             visitedDate: parseVisitedDate
         })
 
@@ -159,10 +173,10 @@ const addTravelStory = asyncHandler( async (req, res) => {
 })
 
 const getAllStories = asyncHandler( async (req, res) => {
-    const { userId } = req.params
+    const { _id } = req.user
     
     try {
-        const travelStories = await TravelStory.find({ userId: userId }).sort({ isFavourite: -1})
+        const travelStories = await TravelStory.find({ userId: _id }).sort({ isFavourite: -1})
 
         return res
         .status(200)
@@ -235,11 +249,12 @@ const deleteStory = asyncHandler( async (req, res) => {
 })
 
 const updateIsFavourite = asyncHandler( async (req, res) => {
-    const { id, userId } = req.params
+    const { id } = req.params
     const { isFavourite } = req.body
+    const { _id } = req.user
 
     try {
-        const travelStory = await TravelStory.findOne({ _id: id, userId: userId })
+        const travelStory = await TravelStory.findOne({ _id: id, userId: _id })
 
         if (!travelStory) {
             throw new ApiError(404, "Story not found")
