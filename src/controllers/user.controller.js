@@ -134,9 +134,6 @@ const addTravelStory = asyncHandler( async (req, res) => {
         throw new ApiError(400, "All fields are required...")
     }
 
-    //Convert visitedDate from milliseconds to Date Object
-    const parseVisitedDate = new Date(parseInt(visitedDate))
-
     const imageLocalPath = req.file?.path
     
     if (!imageLocalPath) {
@@ -144,7 +141,6 @@ const addTravelStory = asyncHandler( async (req, res) => {
     }
 
     const image = await uploadOnCloudinary(imageLocalPath)
-    console.log(image)
     if (!image) {
         throw new ApiError(400, "Image local path is Required...")
     }
@@ -156,7 +152,7 @@ const addTravelStory = asyncHandler( async (req, res) => {
             story,
             visitedLocation, 
             imageUrl: image.url, 
-            visitedDate: parseVisitedDate
+            visitedDate
         })
 
         await travelStory.save()
