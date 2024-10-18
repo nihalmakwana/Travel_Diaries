@@ -29,7 +29,10 @@ router.route("/add-travel-story").post(
     addTravelStory
 )
 router.route("/get-all-stories").get(verifyJWT, getAllStories)
-router.route("/edit-story").post(verifyJWT, editStory)
+router.route("/edit-story/:id").post(verifyJWT,
+    upload.single("imageUrl"),
+    editStory
+)
 router.route("/delete-story/:id/:userId").delete(verifyJWT, deleteStory)
 router.route("/update-is-favourite/:id").post(verifyJWT, updateIsFavourite)
 router.route("/search-story/:userId").post(verifyJWT, searchStory)

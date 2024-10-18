@@ -186,16 +186,21 @@ const getAllStories = asyncHandler( async (req, res) => {
 })
 
 const editStory = asyncHandler( async (req, res) => {
-    const { id, userId, title, story, visitedLocation, imageUrl, visitedDate } = req.body
+    const { title, story, visitedLocation, visitedDate, imageUrl } = req.body
+    const { id } = req.params
+    const { _id } = req.user
 
-    if (!title || !story || !visitedLocation || !imageUrl || !visitedDate) {
+    console.log(title, story, visitedLocation, visitedDate);
+    
+
+    if (!title || !story || !visitedLocation || !visitedDate) {
         throw new ApiError(400, "All Fields are required...")
     }
 
-    const parseVisitedDate = new Date(parseInt(visitedDate))
+    // const parseVisitedDate = new Date(parseInt(visitedDate))
 
     try {
-        const travelStory = await TravelStory.findOne({ _id: id, userId: userId })
+        const travelStory = await TravelStory.findOne({ _id: id, userId: _id })
 
         if (!travelStory) {
             throw new ApiError(404, "Travel Story not found...")
@@ -203,11 +208,22 @@ const editStory = asyncHandler( async (req, res) => {
 
         const placeHolderImage = "https://lh3.googleusercontent.com/gg/ACM6BItGHs88HrzXHQAZQVl25ZboSLilga2E89Yu-exQpGhkFb9Pq1FvwgWhtQurcR9RFdVYiSJsleqKBkfcY7czFfsDFbmj1Akbi8FhiJ2l-W1foVAR-ZIXoJg9qxGTUFxar-h963oaRrQK5sV8tkOIKKNTeQzHNaaBgJsk0i8OqDTSUMB2wLs"
 
+        const imageLocalPath = imageUrl
+    
+        if (!imageLocalPath) {
+            throw new ApiError(400, "Image is Required...")
+        }
+
+        const image = await uploadOnCloudinary(imageLocalPath)
+        if (!image) {
+            throw new ApiError(400, "Image local path is Required...")
+        }
+
         travelStory.title = title
         travelStory.story = story
         travelStory.visitedLocation = visitedLocation
-        travelStory.imageUrl = imageUrl || placeHolderImage
-        travelStory.visitedDate = parseVisitedDate
+        travelStory.imageUrl = image.url || placeHolderImage
+        travelStory.visitedDate = visitedDate
 
         await travelStory.save()
 
@@ -218,7 +234,7 @@ const editStory = asyncHandler( async (req, res) => {
         )
 
     } catch (error) {
-        throw new ApiError()
+        throw new ApiError(400, error?.message)
     }
 })
 
