@@ -33,7 +33,7 @@ router.route("/edit-story/:id").post(verifyJWT,
     upload.single("imageUrl"),
     editStory
 )
-router.route("/delete-story/:id/:userId").delete(verifyJWT, deleteStory)
+router.route("/delete-story/:id").delete(verifyJWT, deleteStory)
 router.route("/update-is-favourite/:id").post(verifyJWT, updateIsFavourite)
 router.route("/search-story/:userId").post(verifyJWT, searchStory)
 router.route("/filter-stories/:userId").get(verifyJWT, filterStories)

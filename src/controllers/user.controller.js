@@ -190,9 +190,6 @@ const editStory = asyncHandler( async (req, res) => {
     const { id } = req.params
     const { _id } = req.user
 
-    console.log(title, story, visitedLocation, visitedDate);
-    
-
     if (!title || !story || !visitedLocation || !visitedDate) {
         throw new ApiError(400, "All Fields are required...")
     }
@@ -208,7 +205,12 @@ const editStory = asyncHandler( async (req, res) => {
 
         const placeHolderImage = "https://lh3.googleusercontent.com/gg/ACM6BItGHs88HrzXHQAZQVl25ZboSLilga2E89Yu-exQpGhkFb9Pq1FvwgWhtQurcR9RFdVYiSJsleqKBkfcY7czFfsDFbmj1Akbi8FhiJ2l-W1foVAR-ZIXoJg9qxGTUFxar-h963oaRrQK5sV8tkOIKKNTeQzHNaaBgJsk0i8OqDTSUMB2wLs"
 
-        const imageLocalPath = imageUrl
+        let imageLocalPath = ""
+        if (imageUrl) {
+            imageLocalPath = imageUrl
+        }else{
+            imageLocalPath = req.file?.path
+        }
     
         if (!imageLocalPath) {
             throw new ApiError(400, "Image is Required...")
@@ -239,10 +241,11 @@ const editStory = asyncHandler( async (req, res) => {
 })
 
 const deleteStory = asyncHandler( async (req, res) => {
-    const { id, userId } = req.params
+    const { id } = req.params
+    const { _id } = req.user
 
     try {
-        const travelStory = await TravelStory.findOne({ _id: id, userId: userId })
+        const travelStory = await TravelStory.findOne({ _id: id, userId: _id })
 
         if (!travelStory) {
             throw new ApiError(404, "Story not found...")
