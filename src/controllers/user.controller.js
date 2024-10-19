@@ -292,7 +292,7 @@ const updateIsFavourite = asyncHandler( async (req, res) => {
 
 const searchStory = asyncHandler( async (req, res) => {
     const { query } = req.query
-    const { userId } = req.body
+    const { _id } = req.user
 
     if (!query) {
         throw new ApiError(401, "Query is required")
@@ -300,7 +300,7 @@ const searchStory = asyncHandler( async (req, res) => {
 
     try {
         const searchResults = await TravelStory.find({
-            userId: userId,
+            userId: _id,
             $or: [
                 { title: { $regex: query, $options: "i" }},
                 { story: { $regex: query, $options: "i" }},
@@ -317,7 +317,7 @@ const searchStory = asyncHandler( async (req, res) => {
     } catch (error) {
         throw new ApiError(500, error?.message || "Can't Search..")
     }
-})   // Not searching  
+})   
 
 const filterStories = asyncHandler( async (req, res) => {
     const { startDate, endDate } = req.query
