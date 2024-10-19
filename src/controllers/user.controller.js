@@ -251,7 +251,7 @@ const deleteStory = asyncHandler( async (req, res) => {
             throw new ApiError(404, "Story not found...")
         }
 
-        await travelStory.deleteOne({ id: id, userId: userId })
+        await travelStory.deleteOne({ id: id, userId: _id })
         
         return res
         .status(200)
