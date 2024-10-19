@@ -321,14 +321,14 @@ const searchStory = asyncHandler( async (req, res) => {
 
 const filterStories = asyncHandler( async (req, res) => {
     const { startDate, endDate } = req.query
-    const { userId } = req.params
+    const { _id } = req.user
 
     try {
         const start = new Date(parseInt(startDate))
         const end = new Date(parseInt(endDate))
 
         const filterStories = await TravelStory.find({
-            userId: userId,
+            userId: _id,
             visitedDate: { $gte: start, $lte: end }
         }).sort({ isFavourite: -1 })
 

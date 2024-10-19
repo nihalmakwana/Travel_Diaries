@@ -36,6 +36,6 @@ router.route("/edit-story/:id").post(verifyJWT,
 router.route("/delete-story/:id").delete(verifyJWT, deleteStory)
 router.route("/update-is-favourite/:id").post(verifyJWT, updateIsFavourite)
 router.route("/search-story").get(verifyJWT, searchStory)
-router.route("/filter-stories/:userId").get(verifyJWT, filterStories)
+router.route("/filter-stories").get(verifyJWT, filterStories)
 
 export default router
